@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>携程旅行 - 机票酒店火车票汽车票门票</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 自定义字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff6700',
+                        secondary: '#f5f5f5',
+                        success: '#00c800',
+                        warning: '#ff9900',
+                        danger: '#ff3b30',
+                        info: '#007aff',
+                        light: '#f8f8f8',
+                        dark: '#333333',
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'system-ui', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                @apply shadow-lg hover:shadow-xl transition-shadow duration-300;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300;
+            }
+            .btn-secondary {
+                @apply bg-white hover:bg-gray-100 text-primary font-medium py-2 px-4 rounded-lg border border-primary transition-colors duration-300;
+            }
+            .input-field {
+                @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+            }
+            .nav-link {
+                @apply px-3 py-2 text-gray-600 hover:text-primary transition-colors duration-200;
+            }
+            .nav-link-active {
+                @apply text-primary border-b-2 border-primary;
+            }
+            .tab-active {
+                @apply text-primary border-b-2 border-primary;
+            }
+            .card-hover {
+                @apply hover:scale-105 transition-transform duration-300;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light font-sans">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <!-- 顶部信息栏 -->
+        <div class="bg-gray-100 text-gray-600 text-xs py-1">
+            <div class="container mx-auto px-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="hover:text-primary">登录</a>
+                    <a href="#" class="hover:text-primary">注册</a>
+                    <a href="#" class="hover:text-primary">我的携程</a>
+                    <a href="#" class="hover:text-primary">企业差旅</a>
+                    <a href="#" class="hover:text-primary">客服</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="hover:text-primary">APP下载</a>
+                    <a href="#" class="hover:text-primary">网站地图</a>
+                    <a href="#" class="hover:text-primary">English</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主导航栏 -->
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="#" class="text-3xl font-bold text-primary">携程旅行</a>
+                    <span class="ml-2 text-xs text-gray-500">机票酒店火车票汽车票门票</span>
+                </div>
+                
+                <!-- 导航菜单 -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <a href="#" class="nav-link nav-link-active">首页</a>
+                    <a href="#" class="nav-link">机票</a>
+                    <a href="#" class="nav-link">酒店</a>
+                    <a href="#" class="nav-link">火车票</a>
+                    <a href="#" class="nav-link">汽车票</a>
+                    <a href="#" class="nav-link">门票</a>
+                    <a href="#" class="nav-link">旅游</a>
+                    <a href="#" class="nav-link">攻略</a>
+                    <a href="#" class="nav-link">更多</a>
+                </nav>
+                
+                <!-- 搜索框 -->
+                <div class="hidden md:flex items-center">
+                    <input type="text" placeholder="搜索目的地/景点/酒店" class="input-field w-64">
+                    <button class="btn-primary ml-2">搜索</button>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <button class="md:hidden text-gray-600">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 搜索栏 -->
+    <section class="bg-primary py-6">
+        <div class="container mx-auto px-4">
+            <div class="bg-white rounded-lg shadow-lg p-4">
+                <!-- 搜索标签 -->
+                <div class="flex border-b mb-4">
+                    <button class="tab-active px-4 py-2 font-medium">国内机票</button>
+                    <button class="px-4 py-2 font-medium text-gray-600 hover:text-primary">国际机票</button>
+                    <button class="px-4 py-2 font-medium text-gray-600 hover:text-primary">酒店</button>
+                    <button class="px-4 py-2 font-medium text-gray-600 hover:text-primary">火车票</button>
+                    <button class="px-4 py-2 font-medium text-gray-600 hover:text-primary">汽车票</button>
+                    <button class="px-4 py-2 font-medium text-gray-600 hover:text-primary">门票</button>
+                </div>
+                
+                <!-- 搜索表单 -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">出发城市</label>
+                        <input type="text" class="input-field" placeholder="请输入出发城市">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">到达城市</label>
+                        <input type="text" class="input-field" placeholder="请输入到达城市">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">出发日期</label>
+                        <input type="date" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">返程日期</label>
+                        <input type="date" class="input-field">
+                    </div>
+                </div>
+                
+                <!-- 搜索按钮 -->
+                <div class="mt-4 flex justify-center">
+                    <button class="btn-primary text-lg px-8 py-3">
+                        <i class="fa fa-search mr-2"></i> 搜索
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 轮播图 -->
+    <section class="container mx-auto px-4 py-6">
+        <div class="relative rounded-xl overflow-hidden card-shadow">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beautiful%20travel%20destination%20landscape%20with%20mountains%20and%20lake&image_size=landscape_16_9" alt="轮播图" class="w-full h-80 object-cover">
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                <h3 class="text-white text-2xl font-bold">探索世界的每一个角落</h3>
+                <p class="text-white/80 mt-2">发现更多精彩目的地，享受优惠价格</p>
+            </div>
+            <!-- 轮播指示器 -->
+            <div class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+                <button class="w-3 h-3 rounded-full bg-white"></button>
+                <button class="w-3 h-3 rounded-full bg-white/50"></button>
+                <button class="w-3 h-3 rounded-full bg-white/50"></button>
+                <button class="w-3 h-3 rounded-full bg-white/50"></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 热门推荐 -->
+    <section class="container mx-auto px-4 py-6">
+        <h2 class="text-2xl font-bold mb-4">热门推荐</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beach%20resort%20tropical%20vacation&image_size=landscape_4_3" alt="海岛度假" class="w-full h-40 object-cover">
+                <div class="p-3">
+                    <h3 class="font-medium">海岛度假</h3>
+                    <p class="text-xs text-gray-500 mt-1">阳光沙滩，海浪拍岸</p>
+                    <p class="text-primary font-medium mt-2">¥1,299起</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mountain%20hiking%20scenic%20view&image_size=landscape_4_3" alt=" mountain climbing" class="w-full h-40 object-cover">
+                <div class="p-3">
+                    <h3 class="font-medium"> mountain climbing</h3>
+                    <p class="text-xs text-gray-500 mt-1">挑战自我，征服高峰</p>
+                    <p class="text-primary font-medium mt-2">¥899起</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20city%20historical%20landmark&image_size=landscape_4_3" alt="文化古迹" class="w-full h-40 object-cover">
+                <div class="p-3">
+                    <h3 class="font-medium">文化古迹</h3>
+                    <p class="text-xs text-gray-500 mt-1">历史悠久，文化底蕴</p>
+                    <p class="text-primary font-medium mt-2">¥599起</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=city%20skyline%20modern%20metropolis&image_size=landscape_4_3" alt="城市观光" class="w-full h-40 object-cover">
+                <div class="p-3">
+                    <h3 class="font-medium">城市观光</h3>
+                    <p class="text-xs text-gray-500 mt-1">现代都市，时尚潮流</p>
+                    <p class="text-primary font-medium mt-2">¥799起</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 机票特惠 -->
+    <section class="container mx-auto px-4 py-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">机票特惠</h2>
+            <a href="#" class="text-primary hover:underline">查看更多 <i class="fa fa-angle-right"></i></a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-lg p-4 card-shadow">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h3 class="font-medium">北京 → 上海</h3>
+                        <p class="text-xs text-gray-500 mt-1">单程 · 经济舱</p>
+                    </div>
+                    <p class="text-primary font-bold text-xl">¥399</p>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span>10月15日</span>
+                    <span>剩余8张</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 card-shadow">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h3 class="font-medium">上海 → 广州</h3>
+                        <p class="text-xs text-gray-500 mt-1">单程 · 经济舱</p>
+                    </div>
+                    <p class="text-primary font-bold text-xl">¥499</p>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span>10月20日</span>
+                    <span>剩余12张</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 card-shadow">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h3 class="font-medium">广州 → 成都</h3>
+                        <p class="text-xs text-gray-500 mt-1">单程 · 经济舱</p>
+                    </div>
+                    <p class="text-primary font-bold text-xl">¥599</p>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span>10月25日</span>
+                    <span>剩余5张</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 酒店特惠 -->
+    <section class="container mx-auto px-4 py-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">酒店特惠</h2>
+            <a href="#" class="text-primary hover:underline">查看更多 <i class="fa fa-angle-right"></i></a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20hotel%20room%20interior&image_size=landscape_4_3" alt="豪华酒店" class="w-full h-40 object-cover">
+                <div class="p-3">
+                    <div class="flex items-center mb-2">
+                        <span class="bg-primary text-white text-xs px-1 rounded">5钻</span>
+                        <h3 class="font-medium ml-2">豪华酒店</h3>
+                    </div>
+                    <p class="text-xs text-gray-500">上海市中心</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-primary font-bold">¥899<span class="text-xs text-gray-500 line-through ml-1">¥1299</span></p>
+                        <span class="text-xs text-gray-500">评分4.8</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=business%20hotel%20modern%20room&image_size=landscape_4_3" alt="商务酒店" class="w-full h-40 object-cover">
+                <div class="p-3">
+                    <div class="flex items-center mb-2">
+                        <span class="bg-primary text-white text-xs px-1 rounded">4钻</span>
+                        <h3 class="font-medium ml-2">商务酒店</h3>
+                    </div>
+                    <p class="text-xs text-gray-500">北京市朝阳区</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-primary font-bold">¥499<span class="text-xs text-gray-500 line-through ml-1">¥699</span></p>
+                        <span class="text-xs text-gray-500">评分4.6</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=budget%20hotel%20clean%20room&image_size=landscape_4_3" alt="经济酒店" class="w-full h-40 object-cover">
+                <div class="p-3">
+                    <div class="flex items-center mb-2">
+                        <span class="bg-gray-500 text-white text-xs px-1 rounded">3钻</span>
+                        <h3 class="font-medium ml-2">经济酒店</h3>
+                    </div>
+                    <p class="text-xs text-gray-500">广州市天河区</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-primary font-bold">¥299<span class="text-xs text-gray-500 line-through ml-1">¥399</span></p>
+                        <span class="text-xs text-gray-500">评分4.3</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=homestay%20cozy%20room&image_size=landscape_4_3" alt="民宿" class="w-full h-40 object-cover">
+                <div class="p-3">
+                    <div class="flex items-center mb-2">
+                        <span class="bg-secondary text-white text-xs px-1 rounded">特色</span>
+                        <h3 class="font-medium ml-2">精品民宿</h3>
+                    </div>
+                    <p class="text-xs text-gray-500">杭州市西湖区</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-primary font-bold">¥399<span class="text-xs text-gray-500 line-through ml-1">¥599</span></p>
+                        <span class="text-xs text-gray-500">评分4.9</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 旅游套餐 -->
+    <section class="container mx-auto px-4 py-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">旅游套餐</h2>
+            <a href="#" class="text-primary hover:underline">查看更多 <i class="fa fa-angle-right"></i></a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hainan%20island%20beach%20vacation&image_size=landscape_16_9" alt="海南三亚5日游" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="font-medium text-lg">海南三亚5日游</h3>
+                    <p class="text-xs text-gray-500 mt-1">含机票+酒店+接送机</p>
+                    <div class="flex items-center mt-2">
+                        <span class="bg-primary text-white text-xs px-1 rounded">热门</span>
+                        <span class="text-xs text-gray-500 ml-2">已售2345件</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-3">
+                        <p class="text-primary font-bold text-xl">¥2,999</p>
+                        <button class="btn-secondary">立即预订</button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chengdu%20panda%20tourism&image_size=landscape_16_9" alt="成都熊猫3日游" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="font-medium text-lg">成都熊猫3日游</h3>
+                    <p class="text-xs text-gray-500 mt-1">含酒店+门票+导游</p>
+                    <div class="flex items-center mt-2">
+                        <span class="bg-success text-white text-xs px-1 rounded">特惠</span>
+                        <span class="text-xs text-gray-500 ml-2">已售1892件</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-3">
+                        <p class="text-primary font-bold text-xl">¥1,599</p>
+                        <button class="btn-secondary">立即预订</button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beijing%20great%20wall%20tour&image_size=landscape_16_9" alt="北京长城一日游" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="font-medium text-lg">北京长城一日游</h3>
+                    <p class="text-xs text-gray-500 mt-1">含门票+午餐+接送</p>
+                    <div class="flex items-center mt-2">
+                        <span class="bg-warning text-white text-xs px-1 rounded">推荐</span>
+                        <span class="text-xs text-gray-500 ml-2">已售3456件</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-3">
+                        <p class="text-primary font-bold text-xl">¥399</p>
+                        <button class="btn-secondary">立即预订</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 景点门票 -->
+    <section class="container mx-auto px-4 py-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">景点门票</h2>
+            <a href="#" class="text-primary hover:underline">查看更多 <i class="fa fa-angle-right"></i></a>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=forbidden%20city%20beijing&image_size=square" alt="故宫博物院" class="w-full h-32 object-cover">
+                <div class="p-2">
+                    <h3 class="font-medium text-sm">故宫博物院</h3>
+                    <p class="text-primary text-xs font-bold mt-1">¥60起</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=great%20wall%20of%20china&image_size=square" alt="八达岭长城" class="w-full h-32 object-cover">
+                <div class="p-2">
+                    <h3 class="font-medium text-sm">八达岭长城</h3>
+                    <p class="text-primary text-xs font-bold mt-1">¥40起</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=west%20lake%20hangzhou&image_size=square" alt="西湖" class="w-full h-32 object-cover">
+                <div class="p-2">
+                    <h3 class="font-medium text-sm">西湖</h3>
+                    <p class="text-primary text-xs font-bold mt-1">免费</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=jiuzhaigou%20valley%20scenic&image_size=square" alt="九寨沟" class="w-full h-32 object-cover">
+                <div class="p-2">
+                    <h3 class="font-medium text-sm">九寨沟</h3>
+                    <p class="text-primary text-xs font-bold mt-1">¥220起</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=yellow%20mountain%20scenic&image_size=square" alt="黄山" class="w-full h-32 object-cover">
+                <div class="p-2">
+                    <h3 class="font-medium text-sm">黄山</h3>
+                    <p class="text-primary text-xs font-bold mt-1">¥230起</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 旅游攻略 -->
+    <section class="container mx-auto px-4 py-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">旅游攻略</h2>
+            <a href="#" class="text-primary hover:underline">查看更多 <i class="fa fa-angle-right"></i></a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <div class="flex flex-col md:flex-row">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=tokyo%20travel%20guide&image_size=landscape_4_3" alt="东京自由行攻略" class="w-full md:w-1/3 h-40 object-cover">
+                    <div class="p-4 md:w-2/3">
+                        <h3 class="font-medium">东京自由行攻略：7天6晚完美行程</h3>
+                        <p class="text-xs text-gray-500 mt-2 line-clamp-2">东京是一座融合了传统与现代的城市，这里有繁华的商业区，也有宁静的寺庙神社。本攻略将为你规划7天6晚的完美行程，让你充分体验东京的魅力。</p>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">2023-10-01</span>
+                            <span class="text-xs text-gray-500">阅读量 12,345</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <div class="flex flex-col md:flex-row">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=thailand%20beach%20vacation&image_size=landscape_4_3" alt="泰国普吉岛度假攻略" class="w-full md:w-1/3 h-40 object-cover">
+                    <div class="p-4 md:w-2/3">
+                        <h3 class="font-medium">泰国普吉岛度假攻略：阳光沙滩的完美假期</h3>
+                        <p class="text-xs text-gray-500 mt-2 line-clamp-2">普吉岛是泰国最大的岛屿，以其美丽的海滩、清澈的海水和丰富的水上活动而闻名。本攻略将为你提供详细的行程规划、住宿推荐和美食指南。</p>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">2023-09-15</span>
+                            <span class="text-xs text-gray-500">阅读量 9,876</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <div class="flex flex-col md:flex-row">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=paris%20eiffel%20tower&image_size=landscape_4_3" alt="巴黎浪漫之旅" class="w-full md:w-1/3 h-40 object-cover">
+                    <div class="p-4 md:w-2/3">
+                        <h3 class="font-medium">巴黎浪漫之旅：5天4晚精华行程</h3>
+                        <p class="text-xs text-gray-500 mt-2 line-clamp-2">巴黎是世界上最浪漫的城市之一，这里有埃菲尔铁塔、卢浮宫、巴黎圣母院等著名景点。本攻略将为你规划5天4晚的精华行程，让你感受巴黎的浪漫与艺术气息。</p>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">2023-09-01</span>
+                            <span class="text-xs text-gray-500">阅读量 15,678</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg overflow-hidden card-shadow card-hover">
+                <div class="flex flex-col md:flex-row">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=kyoto%20temple%20japan&image_size=landscape_4_3" alt="京都古寺巡礼" class="w-full md:w-1/3 h-40 object-cover">
+                    <div class="p-4 md:w-2/3">
+                        <h3 class="font-medium">京都古寺巡礼：传统文化的魅力</h3>
+                        <p class="text-xs text-gray-500 mt-2 line-clamp-2">京都是日本的古都，拥有众多历史悠久的寺庙和神社。本攻略将带你领略京都的传统文化魅力，包括金阁寺、清水寺、伏见稻荷大社等著名景点。</p>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">2023-08-15</span>
+                            <span class="text-xs text-gray-500">阅读量 8,765</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部信息 -->
+    <footer class="bg-dark text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-medium mb-4">关于携程</h3>
+                    <ul class="text-gray-400 text-sm space-y-2">
+                        <li><a href="#" class="hover:text-white">公司介绍</a></li>
+                        <li><a href="#" class="hover:text-white">加入我们</a></li>
+                        <li><a href="#" class="hover:text-white">联系我们</a></li>
+                        <li><a href="#" class="hover:text-white">企业责任</a></li>
+                        <li><a href="#" class="hover:text-white">投资者关系</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium mb-4">帮助中心</h3>
+                    <ul class="text-gray-400 text-sm space-y-2">
+                        <li><a href="#" class="hover:text-white">常见问题</a></li>
+                        <li><a href="#" class="hover:text-white">预订指南</a></li>
+                        <li><a href="#" class="hover:text-white">支付方式</a></li>
+                        <li><a href="#" class="hover:text-white">退款政策</a></li>
+                        <li><a href="#" class="hover:text-white">客服中心</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium mb-4">合作伙伴</h3>
+                    <ul class="text-gray-400 text-sm space-y-2">
+                        <li><a href="#" class="hover:text-white">航空公司</a></li>
+                        <li><a href="#" class="hover:text-white">酒店合作</a></li>
+                        <li><a href="#" class="hover:text-white">景区合作</a></li>
+                        <li><a href="#" class="hover:text-white">旅游社合作</a></li>
+                        <li><a href="#" class="hover:text-white">API合作</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium mb-4">关注我们</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fa fa-weibo text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fa fa-wechat text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fa fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fa fa-twitter text-xl"></i></a>
+                    </div>
+                    <div class="bg-gray-800 p-3 rounded-lg">
+                        <h4 class="text-sm font-medium mb-2">下载携程APP</h4>
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=QR%20code%20for%20app%20download&image_size=square" alt="APP下载二维码" class="w-24 h-24">
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-6 text-center text-gray-400 text-sm">
+                <p>© 2023 携程旅行网 版权所有 ICP证：京B2-20080004</p>
+                <p class="mt-2">旅游投诉热线：12345 | 违法和不良信息举报电话：12377</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all duration-300">
+        <i class="fa fa-chevron-up"></i>
+    </button>
+
+    <!-- JavaScript -->
+    <script>
+        // 回到顶部按钮
+        document.addEventListener('DOMContentLoaded', function() {
+            const backToTopButton = document.getElementById('back-to-top');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.remove('opacity-0', 'invisible');
+                    backToTopButton.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTopButton.classList.remove('opacity-100', 'visible');
+                    backToTopButton.classList.add('opacity-0', 'invisible');
+                }
+            });
+            
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
